@@ -33,7 +33,7 @@ public interface NooliteConnectorInterface {
      * @param listener
      *            Event listener instance to handle events.
      */
-    public void addEventListener(String /* RFXComEventListener */ listener);
+    public void addEventListener(NooliteEventsListener listener);
 
     /**
      * Procedure for remove event listener.
@@ -41,5 +41,5 @@ public interface NooliteConnectorInterface {
      * @param listener
      *            Event listener instance to remove.
      */
-    public void removeEventListener(String/* RFXComEventListener */ listener);
+    public void removeEventListener(NooliteEventsListener listener);
 }
