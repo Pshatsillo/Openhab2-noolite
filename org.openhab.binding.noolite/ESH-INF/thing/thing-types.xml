@@ -1,24 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<thing:thing-descriptions bindingId="noolite"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
-        xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+<thing:thing-descriptions bindingId="noolite" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
-    <!-- Sample Thing Type -->
-    <thing-type id="devices">
-        <label>noolite Binding Thing</label>
-        <description>Sample thing for noolite Binding</description>
+	<thing-type id="devices">
 
-        <channels>
-            <channel id="temperature" typeId="temperature-channel"/>
-        </channels>
-    </thing-type>
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridgeMTRF64" />
+		</supported-bridge-type-refs>
 
-    <!-- Sample Channel Type -->
-    <channel-type id="temp-channel">
-        <item-type>temperature</item-type>
-        <label>nTemperature Channel</label>
-        <description>Sample channel for noolite Binding</description>
-    </channel-type>
+		<label>Noolite Channel</label>
+		<description>Sample thing for noolite Binding</description>
+
+		<channels>
+			<channel id="switch" typeId="switch" />
+		</channels>
+		<config-description>
+			<parameter name="port" type="integer" required="true" min="0" max="64">
+				<context>Channel address</context>
+				<label>Channel Addreess</label>
+				<description>Select channel for noolite device</description>
+				<default>0</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+
+
+	<channel-type id="switch">
+		<item-type>Switch</item-type>
+		<label>Input</label>
+		<description>Port set as input signal for switch using</description>
+	</channel-type>
 
 </thing:thing-descriptions>

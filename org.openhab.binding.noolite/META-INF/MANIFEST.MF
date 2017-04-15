@@ -20,3 +20,4 @@ Import-Package:
 Service-Component: OSGI-INF/*.xml
 Export-Package: org.openhab.binding.noolite,
  org.openhab.binding.noolite.handler
+Require-Bundle: com.google.guava

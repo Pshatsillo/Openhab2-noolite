@@ -7,22 +7,29 @@
  */
 package org.openhab.binding.noolite;
 
+import java.util.Set;
+
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
- * The {@link nooliteBinding} class defines common constants, which are 
+ * The {@link nooliteBinding} class defines common constants, which are
  * used across the whole binding.
- * 
+ *
  * @author Petr Shatsillo - Initial contribution
  */
-public class nooliteBindingConstants {
+public class NooliteBindingConstants {
 
     public static final String BINDING_ID = "noolite";
-    
+
     // List of all Thing Type UIDs
-    public final static ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
+    public final static ThingTypeUID THING_TYPE_DEVICE = new ThingTypeUID(BINDING_ID, "devices");
+    public final static ThingTypeUID THING_TYPE_BRIDGEMTRF64 = new ThingTypeUID(BINDING_ID, "bridgeMTRF64");
 
     // List of all Channel ids
-    public final static String CHANNEL_1 = "channel1";
+    public final static String CHANNEL_SWITCH = "switch";
 
+    public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGEMTRF64,
+            THING_TYPE_DEVICE);
 }
