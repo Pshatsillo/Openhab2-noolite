@@ -42,15 +42,11 @@ public class NooliteFakeAdapterWatcherThread extends Thread {
 
     @Override
     public void run() {
-        byte[] data = new byte[17];
 
-        /*
-         * byte[] data = { (byte) 0b10101101, (byte) 0b00000001, (byte) 0b00000000, (byte) 0b00101101, (byte)
-         * 0b00000000,
-         * (byte) 0b00001111, (byte) 0b00000001, (byte) 0b00000010, (byte) 0b00100001, (byte) 0b00010011,
-         * (byte) 0b11111111, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000,
-         * (byte) 0b00100000, (byte) 0b10101110 };
-         */
+        byte[] data = { (byte) 0b10101101, (byte) 0b00000001, (byte) 0b00000000, (byte) 0b00101101, (byte) 0b00000000,
+                (byte) 0b00001111, (byte) 0b00000001, (byte) 0b00000010, (byte) 0b00100001, (byte) 0b00010011,
+                (byte) 0b11111111, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000,
+                (byte) 0b00100000, (byte) 0b10101110 };
 
         int sum = 0;
         for (int i = 0; i < 14; i++) {
@@ -58,27 +54,27 @@ public class NooliteFakeAdapterWatcherThread extends Thread {
         }
         logger.debug("crc is {}", sum);
 
-        try {
-            logger.debug("Starting data listener");
-            while (stopped != true) {
-                // if (data.length == 17) {
-                if (in.read(data) == 17) {
-                    logger.debug("Received data: {}", DatatypeConverter.printHexBinary(data));
-                    if (((data[0] & 0xFF) == 0b10101101) && (sum == data[15]) && ((data[16] & 0xFF) == 0b10101110)) {
-                        logger.debug("crc correct");
-                        NooliteMTRF64BridgeHandler.updateValues(data);
-                    }
+        logger.debug("Starting data listener");
+        while (stopped != true) {
+            if (data.length == 17) {
 
-                } else {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e1) {
-                    }
+                logger.debug("Received data: {}", DatatypeConverter.printHexBinary(data));
+                if (((data[0] & 0xFF) == 0b10101101) && (sum == data[15]) && ((data[16] & 0xFF) == 0b10101110)) {
+                    logger.debug("crc correct");
+                    NooliteMTRF64BridgeHandler.updateValues(data);
+                }
+
+            } else {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e1) {
                 }
             }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e1) {
+            }
         }
+
     }
 }

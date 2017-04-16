@@ -31,6 +31,8 @@ public class NooliteBindingConstants {
     public final static String CHANNEL_SWITCH = "switch";
     public final static String CHANNEL_TEMPERATURE = "temperature";
     public final static String CHANNEL_HUMIDITY = "humidity";
+    public final static String CHANNEL_BATTERY = "battery";
+    public final static String CHANNEL_SENSOR_TYPE = "sensortype";
 
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BRIDGEMTRF64,
             THING_TYPE_DEVICE);

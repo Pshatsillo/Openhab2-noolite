@@ -10,6 +10,7 @@ package org.openhab.binding.noolite.handler;
 import static org.openhab.binding.noolite.NooliteBindingConstants.CHANNEL_SWITCH;
 
 import org.eclipse.smarthome.core.library.types.DecimalType;
+import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -41,11 +42,6 @@ public class NooliteHandler extends BaseThingHandler {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (channelUID.getId().equals(CHANNEL_SWITCH)) {
-
-            // Note: if communication with thing fails for some reason,
-            // indicate that by setting the status with detail information
-            // updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-            // "Could not control device at IP address x.x.x.x");
         }
     }
 
@@ -113,6 +109,24 @@ public class NooliteHandler extends BaseThingHandler {
                     updateState(channel.getUID().getId(), DecimalType.valueOf(Double.toString(temp)));
                 } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_HUMIDITY)) {
                     updateState(channel.getUID().getId(), DecimalType.valueOf(Integer.toString(data[9])));
+                } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_BATTERY)) {
+
+                    int state = (data[8] >> 7) & 1;
+
+                    if (state == 0) {
+                        updateState(channel.getUID().getId(), StringType.valueOf("OK"));
+                    } else if (state == 1) {
+                        updateState(channel.getUID().getId(), StringType.valueOf("BATT LOW"));
+                    }
+
+                } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_SENSOR_TYPE)) {
+                    int result = (data[8] >> 4) & 7;
+
+                    if (result == 1) {
+                        updateState(channel.getUID().getId(), StringType.valueOf("PT112"));
+                    } else if (result == 2) {
+                        updateState(channel.getUID().getId(), StringType.valueOf("PT111"));
+                    }
                 }
             }
         }

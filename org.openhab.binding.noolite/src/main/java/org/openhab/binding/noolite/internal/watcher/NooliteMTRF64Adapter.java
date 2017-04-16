@@ -41,7 +41,7 @@ public class NooliteMTRF64Adapter implements SerialPortEventListener {
 
     public void connect(String string) {
 
-        watcherThread = new NooliteMTRF64AdapterWatcherThread("fake");
+        watcherThread = new NooliteFakeAdapterWatcherThread("fake");
         watcherThread.start();
 
     }
