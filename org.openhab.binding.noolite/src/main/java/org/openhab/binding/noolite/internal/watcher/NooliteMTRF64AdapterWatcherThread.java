@@ -48,7 +48,7 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
             logger.debug("Starting data listener");
             while (stopped != true) {
                 // if (data.length == 17) {
-                if (in.read(data) == 17) {
+                if (in.read(data) > 0) {
                     logger.debug("Received data: {}", DatatypeConverter.printHexBinary(data));
                     int sum = 0;
                     for (int i = 0; i < 14; i++) {
@@ -58,7 +58,6 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
                         logger.debug("crc correct");
                         NooliteMTRF64BridgeHandler.updateValues(data);
                     }
-
                 } else {
                     try {
                         Thread.sleep(100);
