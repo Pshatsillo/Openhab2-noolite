@@ -15,7 +15,7 @@ import gnu.io.NRSerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 
-public class NooliteMTRF64Adapter extends NooliteBaseAdapter implements SerialPortEventListener {
+public class NooliteMTRF64Adapter implements SerialPortEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(NooliteMTRF64Adapter.class);
     DataInputStream in = null;
@@ -23,7 +23,6 @@ public class NooliteMTRF64Adapter extends NooliteBaseAdapter implements SerialPo
     Thread watcherThread = null;
     NRSerialPort serial;
 
-    @Override
     public void connect(NooliteBridgeConfiguration config) throws Exception {
 
         serial = new NRSerialPort(config.serial, 9600);
@@ -36,8 +35,15 @@ public class NooliteMTRF64Adapter extends NooliteBaseAdapter implements SerialPo
         serial.addEventListener(this);
         serial.notifyOnDataAvailable(true);
 
-        watcherThread = new NooliteWatcherThread(this, in);
+        watcherThread = new NooliteMTRF64AdapterWatcherThread(this, in);
         watcherThread.start();
+    }
+
+    public void connect(String string) {
+
+        watcherThread = new NooliteMTRF64AdapterWatcherThread("fake");
+        watcherThread.start();
+
     }
 
     @Override
@@ -46,7 +52,6 @@ public class NooliteMTRF64Adapter extends NooliteBaseAdapter implements SerialPo
 
     }
 
-    @Override
     public void disconnect() {
         if (serial != null) {
             serial.removeEventListener();
@@ -76,7 +81,6 @@ public class NooliteMTRF64Adapter extends NooliteBaseAdapter implements SerialPo
 
     }
 
-    @Override
     public void sendData(byte[] data) throws IOException {
         logger.trace("Sending {} bytes: {}", data.length, DatatypeConverter.printHexBinary(data));
         out.write(data);

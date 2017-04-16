@@ -14,6 +14,8 @@
 
 		<channels>
 			<channel id="switch" typeId="switch" />
+			<channel id="temperature" typeId="temperature"></channel>
+			<channel id="humidity" typeId="humidity"></channel>
 		</channels>
 		<config-description>
 			<parameter name="port" type="integer" required="true" min="0" max="64">
@@ -22,6 +24,18 @@
 				<description>Select channel for noolite device</description>
 				<default>0</default>
 			</parameter>
+			
+			<parameter name="type" type="text">
+                <label>Type</label>
+                <description>Select type of noolite device</description>
+                <default>1</default>
+                <options>
+                    <option value="0">Noolite TX</option>
+                    <option value="1">Noolite RX</option>
+                    <option value="2">Noolite F TX</option>
+                    <option value="3">Noolite F RX</option>
+                </options>
+            </parameter> 
 		</config-description>
 	</thing-type>
 
@@ -32,5 +46,17 @@
 		<label>Input</label>
 		<description>Port set as input signal for switch using</description>
 	</channel-type>
+	<channel-type id="temperature">
+        <item-type>Number</item-type>
+        <label>Temperature DHT</label>
+        <description>Temperature from DHT sensor</description>
+        <state readOnly="true" pattern="%.1f °C"></state>
+    </channel-type>
+    <channel-type id="humidity">
+        <item-type>Number</item-type>
+        <label>Humidity DHT</label>
+        <description>Humidity from DHT sensor</description>
+        <state readOnly="true" pattern="%.1f"></state>
+    </channel-type>
 
 </thing:thing-descriptions>

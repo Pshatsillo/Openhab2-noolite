@@ -9,12 +9,17 @@ package org.openhab.binding.noolite.handler;
 
 import static org.openhab.binding.noolite.NooliteBindingConstants.CHANNEL_SWITCH;
 
+import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.thing.Bridge;
+import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.openhab.binding.noolite.NooliteBindingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,19 +52,70 @@ public class NooliteHandler extends BaseThingHandler {
     @Override
     public void initialize() {
         bridgeMTRF64 = getBridgeHandler();
+        updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.HANDLER_CONFIGURATION_PENDING);
+        registerMegadThingListener(bridgeMTRF64);
         updateStatus(ThingStatus.ONLINE);
-
-        // Note: When initialization can NOT be done set the status with more details for further
-        // analysis. See also class ThingStatusDetail for all available status details.
-        // Add a description to give user information to understand why thing does not work
-        // as expected. E.g.
-        // updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
-        // "Can not access device as username and/or password are invalid");
     }
 
     private NooliteMTRF64BridgeHandler getBridgeHandler() {
         Bridge bridge = getBridge();
-
-        return null;
+        if (bridge == null) {
+            logger.debug("Required bridge not defined for device {}.", this.getThing().getUID());
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.HANDLER_MISSING_ERROR, "Bridge not defined for device");
+            return null;
+        } else {
+            return getBridgeHandler(bridge);
+        }
     }
+
+    private synchronized NooliteMTRF64BridgeHandler getBridgeHandler(Bridge bridge) {
+
+        NooliteMTRF64BridgeHandler bridgeHandler = null;
+
+        ThingHandler handler = bridge.getHandler();
+        if (handler instanceof NooliteMTRF64BridgeHandler) {
+            bridgeHandler = (NooliteMTRF64BridgeHandler) handler;
+        } else {
+            logger.debug("No available bridge handler found yet. Bridge: {} .", bridge.getUID());
+            bridgeHandler = null;
+        }
+        return bridgeHandler;
+    }
+
+    @Override
+    protected void updateStatus(ThingStatus status) {
+        super.updateStatus(status);
+    }
+
+    private void registerMegadThingListener(NooliteMTRF64BridgeHandler bridgeHandler) {
+        if (bridgeHandler != null) {
+            bridgeHandler.registerMegadThingListener(this);
+        } else {
+            logger.debug("Can't register {} at bridge. BridgeHandler is null.", this.getThing().getUID());
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.HANDLER_INITIALIZING_ERROR, "Bridge is not selected");
+        }
+    }
+
+    public void updateValues(byte[] data) {
+
+        for (Channel channel : getThing().getChannels()) {
+            if (isLinked(channel.getUID().getId())) {
+                if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_TEMPERATURE)) {
+
+                    int intTemp = ((data[8] & 0x0f) << 8) + (data[7] & 0xff);
+
+                    if (intTemp >= 0x800) {
+                        intTemp = intTemp - 0x1000;
+                    }
+
+                    double temp = (double) intTemp / 10;
+
+                    updateState(channel.getUID().getId(), DecimalType.valueOf(Double.toString(temp)));
+                } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_HUMIDITY)) {
+                    updateState(channel.getUID().getId(), DecimalType.valueOf(Integer.toString(data[9])));
+                }
+            }
+        }
+    }
+
 }

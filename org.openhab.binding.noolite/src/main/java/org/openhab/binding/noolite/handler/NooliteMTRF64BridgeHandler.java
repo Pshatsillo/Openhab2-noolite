@@ -1,5 +1,7 @@
 package org.openhab.binding.noolite.handler;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -10,9 +12,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.noolite.internal.config.NooliteBridgeConfiguration;
-import org.openhab.binding.noolite.internal.watcher.NooliteAdaptersInterface;
 import org.openhab.binding.noolite.internal.watcher.NooliteMTRF64Adapter;
-import org.openhab.binding.noolite.internal.watcher.NooliteWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +20,11 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
 
     private Logger logger = LoggerFactory.getLogger(NooliteMTRF64BridgeHandler.class);
     private String comport;
-    NooliteAdaptersInterface adapter;
+    NooliteMTRF64Adapter adapter;
     private NooliteBridgeConfiguration bridgeConfig;
     private ScheduledFuture<?> connectorTask;
-    private MessagesWatcher watcher;
+    public static Map<String, NooliteHandler> thingHandlerMap = new HashMap<String, NooliteHandler>();
+    static NooliteHandler nooliteHandler;
 
     public NooliteMTRF64BridgeHandler(Bridge bridge) {
 
@@ -76,21 +77,58 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
             if (adapter != null) {
                 adapter.disconnect();
                 adapter.connect(bridgeConfig);
-                adapter.addWatcher(watcher);
+                // adapter.connect("fake");
+                // adapter.addWatcher(watcher);
 
             }
+            updateStatus(ThingStatus.ONLINE);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            updateStatus(ThingStatus.OFFLINE);
             e.printStackTrace();
         }
     }
 
-    private class MessagesWatcher implements NooliteWatcher {
+    public void registerMegadThingListener(NooliteHandler thingHandler) {
+        if (thingHandler == null) {
+            throw new IllegalArgumentException("It's not allowed to pass a null ThingHandler.");
+        } else {
 
-        @Override
-        public void dataReceived(byte[] data) {
-            logger.debug("Message received: {}", data);
+            String thingID = thingHandler.getThing().getConfiguration().get("type").toString() + "."
+                    + thingHandler.getThing().getConfiguration().get("port").toString();
+            if (thingHandlerMap.get(thingID) != null) {
+                thingHandlerMap.remove(thingID);
+            }
+            logger.debug("thingHandler for thing: '{}'", thingID);
+            if (thingHandlerMap.get(thingID) == null) {
+                thingHandlerMap.put(thingID, thingHandler);
+                logger.debug("register thingHandler for thing: {}", thingHandler);
+                updateThingHandlerStatus(thingHandler, this.getStatus());
+                if (thingID.equals("localhost.")) {
+                    updateThingHandlerStatus(thingHandler, ThingStatus.OFFLINE);
+                }
+            } else {
+                logger.debug("thingHandler for thing: '{}' already registerd", thingID);
+                updateThingHandlerStatus(thingHandler, this.getStatus());
+            }
+
         }
-
     }
+
+    public ThingStatus getStatus() {
+        return getThing().getStatus();
+    }
+
+    private void updateThingHandlerStatus(NooliteHandler thingHandler, ThingStatus status) {
+        thingHandler.updateStatus(status);
+    }
+
+    public static void updateValues(byte[] data) {
+
+        String thingID = data[1] + "." + data[4];
+        nooliteHandler = thingHandlerMap.get(thingID);
+        if (nooliteHandler != null) {
+            nooliteHandler.updateValues(data);
+        }
+    }
+
 }
