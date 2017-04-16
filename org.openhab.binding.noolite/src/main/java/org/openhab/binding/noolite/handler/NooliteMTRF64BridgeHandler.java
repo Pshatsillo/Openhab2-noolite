@@ -129,7 +129,7 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public static void sendMessage(NooliteHandler nooliteHandler, Command command) {
+    public synchronized void sendMessage(NooliteHandler nooliteHandler, Command command) {
 
         logger.debug("{}", command);
 
@@ -140,14 +140,14 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
         data[3] = 0;
         data[4] = (byte) Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("port").toString());
 
-        if (command.equals("ON")) {
+        if (command.toString().equals("ON")) {
             data[5] = 2;
             data[6] = 0;
             data[7] = 0;
             data[8] = 0;
             data[9] = 0;
             data[10] = 0;
-        } else if (command.equals("OFF")) {
+        } else if (command.toString().equals("OFF")) {
             data[5] = 0;
             data[6] = 0;
             data[7] = 0;
