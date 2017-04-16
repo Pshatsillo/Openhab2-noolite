@@ -1,43 +1,40 @@
-package org.openhab.binding.noolite.internal.connector;
+package org.openhab.binding.noolite.internal.watcher;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.openhab.binding.noolite.internal.config.NooliteBridgeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class NooliteBaseConnector implements NooliteConnectorInterface {
+public abstract class NooliteBaseAdapter implements NooliteAdaptersInterface {
 
-    private static final Logger logger = LoggerFactory.getLogger(NooliteBaseConnector.class);
+    private static final Logger logger = LoggerFactory.getLogger(NooliteBaseAdapter.class);
+    private static List<NooliteWatcher> watchers = new ArrayList<NooliteWatcher>();
 
     @Override
-    public void connect(NooliteBridgeConfiguration config) throws Exception {
-        // TODO Auto-generated method stub
-
+    public void addWatcher(NooliteWatcher watcher) {
+        if (!watchers.contains(watcher)) {
+            watchers.add(watcher);
+        }
     }
 
     @Override
-    public void disconnect() {
-        // TODO Auto-generated method stub
+    public void removeWatcher(NooliteWatcher watcher) {
+        watchers.remove(watcher);
 
     }
 
-    @Override
-    public void sendData(byte[] data) throws IOException {
-        // TODO Auto-generated method stub
+    void sendMsgToWatchers(byte[] msg) {
+        try {
+            Iterator<NooliteWatcher> iterator = watchers.iterator();
 
+            while (iterator.hasNext()) {
+                iterator.next().dataReceived(msg);
+            }
+
+        } catch (Exception e) {
+            logger.error("Event listener invoking error", e);
+        }
     }
-
-    @Override
-    public void addEventListener(NooliteEventsListener listener) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void removeEventListener(NooliteEventsListener listener) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

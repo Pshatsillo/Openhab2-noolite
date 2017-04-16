@@ -10,7 +10,7 @@
 		</description>
 
 		<config-description>
-			<parameter name="comport" type="text" required="true">
+			<parameter name="serial" type="text" required="true">
 				<context>connection-address</context>
 				<label>noolite com port path</label>
 				<description></description>

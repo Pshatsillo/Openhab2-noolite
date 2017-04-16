@@ -1,20 +1,14 @@
 /**
  *
  */
-package org.openhab.binding.noolite.internal.connector;
+package org.openhab.binding.noolite.internal.watcher;
 
 /**
  * @author Petr Shatsillo
  *
  */
-public interface NooliteEventsListener {
+public interface NooliteWatcher {
 
-    /**
-     * Receive raw data from noolite usb controller.
-     *
-     * @param data
-     * 
-     */
-    void packetReceived(byte[] data);
+    void dataReceived(byte[] data);
 
 }
