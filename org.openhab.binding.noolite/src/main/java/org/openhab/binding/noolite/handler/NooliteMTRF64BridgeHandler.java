@@ -168,10 +168,11 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
 
         data[15] = (byte) sum;
         data[16] = (byte) 0b10101100;
-        try {
-            adapter.sendData(data);
-        } catch (IOException e) {
-
+        if (!command.toString().equals("REFRESH")) {
+            try {
+                adapter.sendData(data);
+            } catch (IOException e) {
+            }
         }
 
     }

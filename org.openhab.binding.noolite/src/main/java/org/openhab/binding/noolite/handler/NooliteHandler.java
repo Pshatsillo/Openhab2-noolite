@@ -7,8 +7,6 @@
  */
 package org.openhab.binding.noolite.handler;
 
-import static org.openhab.binding.noolite.NooliteBindingConstants.CHANNEL_SWITCH;
-
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
@@ -41,8 +39,11 @@ public class NooliteHandler extends BaseThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if (channelUID.getId().equals(CHANNEL_SWITCH)) {
+        if (channelUID.getId().equals(NooliteBindingConstants.CHANNEL_SWITCH)) {
             bridgeMTRF64.sendMessage(this, command);
+        }
+        if (channelUID.getId().equals(NooliteBindingConstants.CHANNEL_BINDCHANNEL)) {
+            logger.debug("bindchannel {}", command);
         }
     }
 
