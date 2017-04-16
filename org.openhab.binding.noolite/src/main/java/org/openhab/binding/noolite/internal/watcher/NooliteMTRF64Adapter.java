@@ -82,7 +82,7 @@ public class NooliteMTRF64Adapter implements SerialPortEventListener {
     }
 
     public void sendData(byte[] data) throws IOException {
-        logger.trace("Sending {} bytes: {}", data.length, DatatypeConverter.printHexBinary(data));
+        logger.debug("Sending {} bytes: {}", data.length, DatatypeConverter.printHexBinary(data));
         out.write(data);
         out.flush();
     }

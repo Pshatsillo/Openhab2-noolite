@@ -1,5 +1,6 @@
 package org.openhab.binding.noolite.handler;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -18,9 +19,8 @@ import org.slf4j.LoggerFactory;
 
 public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
 
-    private Logger logger = LoggerFactory.getLogger(NooliteMTRF64BridgeHandler.class);
-    private String comport;
-    NooliteMTRF64Adapter adapter;
+    private static Logger logger = LoggerFactory.getLogger(NooliteMTRF64BridgeHandler.class);
+    static NooliteMTRF64Adapter adapter;
     private NooliteBridgeConfiguration bridgeConfig;
     private ScheduledFuture<?> connectorTask;
     public static Map<String, NooliteHandler> thingHandlerMap = new HashMap<String, NooliteHandler>();
@@ -76,10 +76,8 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
             }
             if (adapter != null) {
                 adapter.disconnect();
-                adapter.connect(bridgeConfig);
-                // adapter.connect("fake");
-                // adapter.addWatcher(watcher);
-
+                // adapter.connect(bridgeConfig);
+                adapter.connect("fake");
             }
             updateStatus(ThingStatus.ONLINE);
         } catch (Exception e) {
@@ -129,6 +127,53 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
         if (nooliteHandler != null) {
             nooliteHandler.updateValues(data);
         }
+    }
+
+    public static void sendMessage(NooliteHandler nooliteHandler, Command command) {
+
+        logger.debug("{}", command);
+
+        byte[] data = new byte[17];
+        data[0] = (byte) 0b10101011;
+        data[1] = (byte) Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("type").toString());
+        data[2] = 0;
+        data[3] = 0;
+        data[4] = (byte) Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("port").toString());
+
+        if (command.equals("ON")) {
+            data[5] = 2;
+            data[6] = 0;
+            data[7] = 0;
+            data[8] = 0;
+            data[9] = 0;
+            data[10] = 0;
+        } else if (command.equals("OFF")) {
+            data[5] = 0;
+            data[6] = 0;
+            data[7] = 0;
+            data[8] = 0;
+            data[9] = 0;
+            data[10] = 0;
+        }
+
+        data[11] = 0;
+        data[12] = 0;
+        data[13] = 0;
+        data[14] = 0;
+
+        short sum = 0;
+        for (int i = 0; i < 14; i++) {
+            sum += data[i];
+        }
+
+        data[15] = (byte) sum;
+        data[16] = (byte) 0b10101100;
+        try {
+            adapter.sendData(data);
+        } catch (IOException e) {
+
+        }
+
     }
 
 }

@@ -14,7 +14,7 @@
 				<context>connection-address</context>
 				<label>noolite com port path</label>
 				<description></description>
-				<default>COM 4</default>
+				<default>COM4</default>
 			</parameter>
 		</config-description>
 

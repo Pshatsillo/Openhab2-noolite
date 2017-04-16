@@ -55,7 +55,6 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
                         sum += data[i];
                     }
                     if (((data[0] & 0xFF) == 0b10101101) && (sum == data[15]) && ((data[16] & 0xFF) == 0b10101110)) {
-                        logger.debug("crc correct");
                         NooliteMTRF64BridgeHandler.updateValues(data);
                     }
                 } else {
