@@ -50,12 +50,28 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
                 // if (data.length == 17) {
                 if (in.read(data) > 0) {
                     logger.debug("Received data: {}", DatatypeConverter.printHexBinary(data));
-                    int sum = 0;
-                    for (int i = 0; i < 14; i++) {
-                        sum += data[i];
+                    short count = 0;
+                    byte sum = 0;
+                    for (int i = 0; i <= 14; i++) {
+                        count += (data[i] & 0xFF);
                     }
-                    if (((data[0] & 0xFF) == 0b10101101) && (sum == data[15]) && ((data[16] & 0xFF) == 0b10101110)) {
-                        NooliteMTRF64BridgeHandler.updateValues(data);
+                    sum = (byte) (count & 0xFF);
+
+                    // logger.debug("sum is {} CRC must be {} receive {}", count, sum, data[15]);
+
+                    if (((data[0] & 0xFF) == 0b10101101) && ((data[16] & 0xFF) == 0b10101110)) {
+                        logger.debug("sum is {} CRC must be {} receive {}", count, sum, data[15]);
+                        if (sum == data[15]) {
+                            logger.debug("CRC is OK");
+
+                            logger.debug("Updating values...");
+                            NooliteMTRF64BridgeHandler.updateValues(data);
+                        } else {
+                            logger.debug("CRC is WRONG");
+                        }
+                    } else {
+                        logger.debug("Start/stop bits is wrong");
+
                     }
                 } else {
                     try {

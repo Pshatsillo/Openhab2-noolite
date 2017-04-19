@@ -40,10 +40,11 @@ public class NooliteHandler extends BaseThingHandler {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (channelUID.getId().equals(NooliteBindingConstants.CHANNEL_SWITCH)) {
-            bridgeMTRF64.sendMessage(this, command);
+            bridgeMTRF64.sendMessage(this, null, command);
         }
         if (channelUID.getId().equals(NooliteBindingConstants.CHANNEL_BINDCHANNEL)) {
             logger.debug("bindchannel {}", command);
+            bridgeMTRF64.sendMessage(this, channelUID, command);
         }
     }
 

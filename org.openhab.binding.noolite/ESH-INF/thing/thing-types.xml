@@ -21,11 +21,11 @@
 			 <channel id="bindchannel" typeId="bindchannel"></channel>
 		</channels>
 		<config-description>
-			<parameter name="port" type="integer" required="true" min="0" max="64">
+			<parameter name="port" type="integer" required="true" min="1" max="99">
 				<context>Channel address</context>
 				<label>Channel Addreess</label>
 				<description>Select channel for noolite device</description>
-				<default>0</default>
+				<default>99</default>
 			</parameter>
 			
 			<parameter name="type" type="text">
@@ -37,6 +37,7 @@
                     <option value="1">Noolite RX</option>
                     <option value="2">Noolite F TX</option>
                     <option value="3">Noolite F RX</option>
+                    <option value="4">Service</option>
                 </options>
             </parameter> 
 		</config-description>

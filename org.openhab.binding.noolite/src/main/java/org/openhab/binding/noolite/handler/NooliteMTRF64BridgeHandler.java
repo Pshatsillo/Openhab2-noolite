@@ -12,6 +12,7 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.openhab.binding.noolite.NooliteBindingConstants;
 import org.openhab.binding.noolite.internal.config.NooliteBridgeConfiguration;
 import org.openhab.binding.noolite.internal.watcher.NooliteMTRF64Adapter;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
 
                 @Override
                 public void run() {
-                    logger.debug("Checking Noolite adapter connection. {}", thing.getStatus());
+                    // logger.debug("Checking Noolite adapter connection. {}", thing.getStatus());
                     if (thing.getStatus() != ThingStatus.ONLINE) {
                         connect();
                     }
@@ -76,8 +77,8 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
             }
             if (adapter != null) {
                 adapter.disconnect();
-                // adapter.connect(bridgeConfig);
-                adapter.connect("fake");
+                adapter.connect(bridgeConfig);
+                // adapter.connect("fake");
             }
             updateStatus(ThingStatus.ONLINE);
         } catch (Exception e) {
@@ -92,7 +93,7 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
         } else {
 
             String thingID = thingHandler.getThing().getConfiguration().get("type").toString() + "."
-                    + thingHandler.getThing().getConfiguration().get("port").toString();
+                    + (Integer.parseInt(thingHandler.getThing().getConfiguration().get("port").toString()) - 1);
             if (thingHandlerMap.get(thingID) != null) {
                 thingHandlerMap.remove(thingID);
             }
@@ -129,7 +130,7 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public synchronized void sendMessage(NooliteHandler nooliteHandler, Command command) {
+    public synchronized void sendMessage(NooliteHandler nooliteHandler, ChannelUID channel, Command command) {
 
         logger.debug("{}", command);
 
@@ -138,8 +139,22 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
         data[1] = (byte) Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("type").toString());
         data[2] = 0;
         data[3] = 0;
-        data[4] = (byte) Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("port").toString());
-
+        if ((channel != null) && (channel.getId().equals(NooliteBindingConstants.CHANNEL_BINDCHANNEL))
+                && !(command.toString().equals("REFRESH"))) {
+            if (Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("type").toString()) == 3) {
+                data[2] = 3;
+            }
+            data[4] = (byte) (Integer.parseInt(command.toString()) - 1);
+            data[5] = 15;
+            data[6] = 0;
+            data[7] = 0;
+            data[8] = 0;
+            data[9] = 0;
+            data[10] = 0;
+        } else {
+            data[4] = (byte) (Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("port").toString())
+                    - 1);
+        }
         if (command.toString().equals("ON")) {
             data[5] = 2;
             data[6] = 0;
