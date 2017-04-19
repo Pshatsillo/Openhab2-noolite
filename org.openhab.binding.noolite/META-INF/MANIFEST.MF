@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: noolite Binding
 Bundle-SymbolicName: org.openhab.binding.noolite;singleton:=true
 Bundle-Vendor: openHAB
-Bundle-Version: 0.1.0
+Bundle-Version: 2.0.1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Import-Package: 
