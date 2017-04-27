@@ -108,27 +108,44 @@ public class NooliteHandler extends BaseThingHandler {
                     }
 
                     double temp = (double) intTemp / 10;
-
-                    updateState(channel.getUID().getId(), DecimalType.valueOf(Double.toString(temp)));
+                    try {
+                        updateState(channel.getUID().getId(), DecimalType.valueOf(Double.toString(temp)));
+                    } catch (Exception ex) {
+                        logger.debug("Temperature update error");
+                    }
                 } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_HUMIDITY)) {
-                    updateState(channel.getUID().getId(), DecimalType.valueOf(Integer.toString(data[9])));
+                    try {
+                        updateState(channel.getUID().getId(), DecimalType.valueOf(Integer.toString(data[9])));
+                    } catch (Exception ex) {
+                        logger.debug("Humidity update error");
+                    }
                 } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_BATTERY)) {
 
                     int state = (data[8] >> 7) & 1;
+                    try {
+                        if (state == 0) {
 
-                    if (state == 0) {
-                        updateState(channel.getUID().getId(), StringType.valueOf("OK"));
-                    } else if (state == 1) {
-                        updateState(channel.getUID().getId(), StringType.valueOf("BATT LOW"));
+                            updateState(channel.getUID().getId(), StringType.valueOf("OK"));
+
+                        } else if (state == 1) {
+
+                            updateState(channel.getUID().getId(), StringType.valueOf("BATT LOW"));
+
+                        }
+                    } catch (Exception ex) {
+                        logger.debug("State update error");
                     }
 
                 } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_SENSOR_TYPE)) {
                     int result = (data[8] >> 4) & 7;
-
-                    if (result == 1) {
-                        updateState(channel.getUID().getId(), StringType.valueOf("PT112"));
-                    } else if (result == 2) {
-                        updateState(channel.getUID().getId(), StringType.valueOf("PT111"));
+                    try {
+                        if (result == 1) {
+                            updateState(channel.getUID().getId(), StringType.valueOf("PT112"));
+                        } else if (result == 2) {
+                            updateState(channel.getUID().getId(), StringType.valueOf("PT111"));
+                        }
+                    } catch (Exception ex) {
+                        logger.debug("Type update error");
                     }
                 }
             }
