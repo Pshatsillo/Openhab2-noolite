@@ -1,41 +1,43 @@
 package org.openhab.binding.noolite.internal.watcher;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.io.IOUtils;
 import org.openhab.binding.noolite.internal.config.NooliteBridgeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gnu.io.NRSerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
+import com.fazecast.jSerialComm.SerialPort;
 
-public class NooliteMTRF64Adapter implements SerialPortEventListener {
+/**
+ * The {@link NooliteMTRF64Adapter} is for init usb stick
+ *
+ * @author Petr Shatsillo - Initial contribution
+ */
+public class NooliteMTRF64Adapter {
 
     private static final Logger logger = LoggerFactory.getLogger(NooliteMTRF64Adapter.class);
-    DataInputStream in = null;
-    DataOutputStream out = null;
+
     Thread watcherThread = null;
-    NRSerialPort serial;
+    private static SerialPort comPort;
 
-    public void connect(NooliteBridgeConfiguration config) throws Exception {
+    public void connect(NooliteBridgeConfiguration config) {
 
-        serial = new NRSerialPort(config.serial, 9600);
-        serial.connect();
+        comPort = SerialPort.getCommPort(config.serial);
+        comPort.openPort();
 
-        in = new DataInputStream(serial.getInputStream());
-        out = new DataOutputStream(serial.getOutputStream());
-        out.flush();
+        if (!comPort.isOpen()) {
+            logger.error("Port is busy");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                logger.error("Sleep error {}", e.getLocalizedMessage());
+            }
+            connect(config);
+        }
 
-        serial.addEventListener(this);
-        serial.notifyOnDataAvailable(true);
-
-        watcherThread = new NooliteMTRF64AdapterWatcherThread(this, in);
+        watcherThread = new NooliteMTRF64AdapterWatcherThread(comPort);
         watcherThread.start();
     }
 
@@ -46,45 +48,25 @@ public class NooliteMTRF64Adapter implements SerialPortEventListener {
 
     }
 
-    @Override
-    public void serialEvent(SerialPortEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void disconnect() {
-        if (serial != null) {
-            serial.removeEventListener();
-        }
 
         if (watcherThread != null) {
             watcherThread.interrupt();
         }
 
-        if (out != null) {
-            logger.debug("Close serial out stream");
-            IOUtils.closeQuietly(out);
-        }
-        if (in != null) {
-            logger.debug("Close serial in stream");
-            IOUtils.closeQuietly(in);
-        }
-
-        if (serial != null) {
+        if (comPort != null) {
             logger.debug("Close serial port");
-            serial.disconnect();
+            comPort.closePort();
         }
 
-        in = null;
-        out = null;
         watcherThread = null;
 
     }
 
     public void sendData(byte[] data) throws IOException {
         logger.debug("Sending {} bytes: {}", data.length, DatatypeConverter.printHexBinary(data));
-        out.write(data);
-        out.flush();
+
+        comPort.writeBytes(data, data.length);
     }
 
 }

@@ -30,7 +30,7 @@ public class NooliteHandlerFactory extends BaseThingHandlerFactory {
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
-        return NooliteBindingConstants.SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
+        return NooliteBindingConstants.BINDING_ID.equals(thingTypeUID.getBindingId());
     }
 
     @Override

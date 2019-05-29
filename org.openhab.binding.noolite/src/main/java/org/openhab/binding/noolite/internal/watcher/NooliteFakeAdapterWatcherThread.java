@@ -9,6 +9,11 @@ import org.openhab.binding.noolite.handler.NooliteMTRF64BridgeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The {@link NooliteFakeAdapterWatcherThread} is for testing signals from usb stick
+ *
+ * @author Petr Shatsillo - Initial contribution
+ */
 public class NooliteFakeAdapterWatcherThread extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(NooliteFakeAdapterWatcherThread.class);
@@ -35,9 +40,8 @@ public class NooliteFakeAdapterWatcherThread extends Thread {
                 in.close();
             }
         } catch (IOException e) {
-            logger.error(e.getLocalizedMessage());
+            logger.warn("{}", e.getLocalizedMessage());
         }
-
     }
 
     @Override
@@ -92,6 +96,5 @@ public class NooliteFakeAdapterWatcherThread extends Thread {
             } catch (InterruptedException e1) {
             }
         }
-
     }
 }

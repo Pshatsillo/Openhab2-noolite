@@ -9,6 +9,13 @@ import org.openhab.binding.noolite.handler.NooliteMTRF64BridgeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fazecast.jSerialComm.SerialPort;
+
+/**
+ * The {@link NooliteMTRF64AdapterWatcherThread} is listener for accepting and transfer signals from usb stick
+ *
+ * @author Petr Shatsillo - Initial contribution
+ */
 public class NooliteMTRF64AdapterWatcherThread extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(NooliteMTRF64AdapterWatcherThread.class);
@@ -16,14 +23,15 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
     private boolean stopped = false;
     private NooliteMTRF64Adapter base;
     DataInputStream in;
+    private static SerialPort comPort;
 
     public NooliteMTRF64AdapterWatcherThread(NooliteMTRF64Adapter nooliteMTRF64Adapter, DataInputStream in) {
         base = nooliteMTRF64Adapter;
         this.in = in;
     }
 
-    public NooliteMTRF64AdapterWatcherThread(String string) {
-
+    public NooliteMTRF64AdapterWatcherThread(SerialPort comPort) {
+        NooliteMTRF64AdapterWatcherThread.comPort = comPort;
     }
 
     @Override
@@ -47,7 +55,6 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
         try {
             logger.debug("Starting data listener");
             while (stopped != true) {
-                // if (data.length == 17) {
                 if (in.read(data) > 0) {
                     logger.debug("Received data: {}", DatatypeConverter.printHexBinary(data));
                     short count = 0;
@@ -56,9 +63,6 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
                         count += (data[i] & 0xFF);
                     }
                     sum = (byte) (count & 0xFF);
-
-                    // logger.debug("sum is {} CRC must be {} receive {}", count, sum, data[15]);
-
                     if (((data[0] & 0xFF) == 0b10101101) && ((data[16] & 0xFF) == 0b10101110)) {
                         logger.debug("sum is {} CRC must be {} receive {}", count, sum, data[15]);
                         if (sum == data[15]) {
@@ -81,8 +85,7 @@ public class NooliteMTRF64AdapterWatcherThread extends Thread {
                 }
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.warn("{}", e.getLocalizedMessage());
         }
     }
 }
