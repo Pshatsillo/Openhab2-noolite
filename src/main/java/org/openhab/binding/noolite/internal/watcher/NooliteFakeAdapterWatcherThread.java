@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2010-2019 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.noolite.internal.watcher;
 
 import java.io.DataInputStream;
@@ -10,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link NooliteFakeAdapterWatcherThread} is for testing signals from usb stick
  *
  * @author Petr Shatsillo - Initial contribution
+ *
  */
 public class NooliteFakeAdapterWatcherThread extends Thread {
 
@@ -40,8 +52,9 @@ public class NooliteFakeAdapterWatcherThread extends Thread {
                 in.close();
             }
         } catch (IOException e) {
-            logger.warn("{}", e.getLocalizedMessage());
+            logger.error(e.getLocalizedMessage());
         }
+
     }
 
     @Override
@@ -96,5 +109,6 @@ public class NooliteFakeAdapterWatcherThread extends Thread {
             } catch (InterruptedException e1) {
             }
         }
+
     }
 }

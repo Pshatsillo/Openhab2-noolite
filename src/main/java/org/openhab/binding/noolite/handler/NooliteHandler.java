@@ -1,9 +1,14 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010-2019 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.binding.noolite.handler;
 
@@ -18,7 +23,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.noolite.NooliteBindingConstants;
+import org.openhab.binding.noolite.NooLiteBindingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +44,10 @@ public class NooliteHandler extends BaseThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if (channelUID.getId().equals(NooliteBindingConstants.CHANNEL_SWITCH)) {
+        if (channelUID.getId().equals(NooLiteBindingConstants.CHANNEL_SWITCH)) {
             bridgeMTRF64.sendMessage(this, null, command);
         }
-        if (channelUID.getId().equals(NooliteBindingConstants.CHANNEL_BINDCHANNEL)) {
+        if (channelUID.getId().equals(NooLiteBindingConstants.CHANNEL_BINDCHANNEL)) {
             logger.debug("bindchannel {}", command);
             bridgeMTRF64.sendMessage(this, channelUID, command);
         }
@@ -99,7 +104,7 @@ public class NooliteHandler extends BaseThingHandler {
 
         for (Channel channel : getThing().getChannels()) {
             if (isLinked(channel.getUID().getId())) {
-                if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_TEMPERATURE)) {
+                if (channel.getUID().getId().equals(NooLiteBindingConstants.CHANNEL_TEMPERATURE)) {
 
                     int intTemp = ((data[8] & 0x0f) << 8) + (data[7] & 0xff);
 
@@ -113,13 +118,13 @@ public class NooliteHandler extends BaseThingHandler {
                     } catch (Exception ex) {
                         logger.debug("Temperature update error");
                     }
-                } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_HUMIDITY)) {
+                } else if (channel.getUID().getId().equals(NooLiteBindingConstants.CHANNEL_HUMIDITY)) {
                     try {
                         updateState(channel.getUID().getId(), DecimalType.valueOf(Integer.toString(data[9])));
                     } catch (Exception ex) {
                         logger.debug("Humidity update error");
                     }
-                } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_BATTERY)) {
+                } else if (channel.getUID().getId().equals(NooLiteBindingConstants.CHANNEL_BATTERY)) {
 
                     int state = (data[8] >> 7) & 1;
                     try {
@@ -136,7 +141,7 @@ public class NooliteHandler extends BaseThingHandler {
                         logger.debug("State update error");
                     }
 
-                } else if (channel.getUID().getId().equals(NooliteBindingConstants.CHANNEL_SENSOR_TYPE)) {
+                } else if (channel.getUID().getId().equals(NooLiteBindingConstants.CHANNEL_SENSOR_TYPE)) {
                     int result = (data[8] >> 4) & 7;
                     try {
                         if (result == 1) {

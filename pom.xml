@@ -11,13 +11,6 @@
 
   <artifactId>org.openhab.binding.noolite</artifactId>
 
-  <name>openHAB Add-ons :: Bundles :: noolite Binding</name>
+  <name>openHAB Add-ons :: Bundles :: NooLite Binding</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.fazecast</groupId>
-            <artifactId>jSerialComm</artifactId>
-            <version>[2.0.0,3.0.0)</version>
-        </dependency>
-    </dependencies>
 </project>

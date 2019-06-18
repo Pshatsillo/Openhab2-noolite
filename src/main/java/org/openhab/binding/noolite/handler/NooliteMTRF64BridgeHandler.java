@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2010-2019 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.noolite.handler;
 
 import java.io.IOException;
@@ -12,18 +24,29 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.noolite.NooliteBindingConstants;
+import org.openhab.binding.noolite.NooLiteBindingConstants;
 import org.openhab.binding.noolite.internal.config.NooliteBridgeConfiguration;
 import org.openhab.binding.noolite.internal.watcher.NooliteMTRF64Adapter;
+/**
+ * Copyright (c) 2010-2019 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link NooliteMTRF64BridgeHandler} is responsible for bridge between USB stick and noolite binding
  *
  * @author Petr Shatsillo - Initial contribution
+ *
  */
-
 public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
 
     private static Logger logger = LoggerFactory.getLogger(NooliteMTRF64BridgeHandler.class);
@@ -36,6 +59,8 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
     public NooliteMTRF64BridgeHandler(Bridge bridge) {
 
         super(bridge);
+        // comport = bridge.getConfiguration().get("comport").toString();
+        // logger.debug("comport is {}", comport);
     }
 
     @Override
@@ -60,6 +85,7 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
 
                 @Override
                 public void run() {
+                    // logger.debug("Checking Noolite adapter connection. {}", thing.getStatus());
                     if (thing.getStatus() != ThingStatus.ONLINE) {
                         connect();
                     }
@@ -81,11 +107,12 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
             if (adapter != null) {
                 adapter.disconnect();
                 adapter.connect(bridgeConfig);
+                // adapter.connect("fake");
             }
             updateStatus(ThingStatus.ONLINE);
         } catch (Exception e) {
             updateStatus(ThingStatus.OFFLINE);
-            logger.error("Connect to adapter error {}", e.getLocalizedMessage());
+            logger.debug(e.getMessage());
         }
     }
 
@@ -141,7 +168,7 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
         data[1] = (byte) Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("type").toString());
         data[2] = 0;
         data[3] = 0;
-        if ((channel != null) && (channel.getId().equals(NooliteBindingConstants.CHANNEL_BINDCHANNEL))
+        if ((channel != null) && (channel.getId().equals(NooLiteBindingConstants.CHANNEL_BINDCHANNEL))
                 && !(command.toString().equals("REFRESH"))) {
             if (Integer.parseInt(nooliteHandler.getThing().getConfiguration().get("type").toString()) == 3) {
                 data[2] = 3;
@@ -189,7 +216,6 @@ public class NooliteMTRF64BridgeHandler extends BaseBridgeHandler {
             try {
                 adapter.sendData(data);
             } catch (IOException e) {
-                logger.error("Send failure, {}", e.getLocalizedMessage());
             }
         }
 
